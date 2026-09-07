@@ -17,24 +17,10 @@ export const LocalAccountModal: React.FC<LocalAccountModalProps> = ({
 }) => {
   const [nickname, setNickname] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('🦊');
-  const [existingProfile, setExistingProfile] = useState<PlayerProfile | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      try {
-        const saved = localStorage.getItem('sliding_puzzle_local_profile');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          setExistingProfile(parsed);
-          setNickname(parsed.name || '');
-          setSelectedAvatar(parsed.avatar || '🦊');
-        } else {
-          const randomNum = Math.floor(100 + Math.random() * 900);
-          setNickname(`Convidado #${randomNum}`);
-        }
-      } catch {
-        setNickname('Convidado #101');
-      }
+      setNickname('');
     }
   }, [isOpen]);
 
@@ -42,7 +28,9 @@ export const LocalAccountModal: React.FC<LocalAccountModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalName = nickname.trim() || 'Convidado Local';
+    const finalName = nickname.trim();
+    if (!finalName) return;
+
     const profile: PlayerProfile = {
       name: finalName,
       avatar: selectedAvatar,
@@ -50,12 +38,6 @@ export const LocalAccountModal: React.FC<LocalAccountModalProps> = ({
     };
     localStorage.setItem('sliding_puzzle_local_profile', JSON.stringify(profile));
     onSaveAccount(profile);
-  };
-
-  const handleUseExisting = () => {
-    if (existingProfile) {
-      onSaveAccount(existingProfile);
-    }
   };
 
   return (
@@ -92,31 +74,6 @@ export const LocalAccountModal: React.FC<LocalAccountModalProps> = ({
           </p>
         </div>
 
-        {/* Existing account banner if available */}
-        {existingProfile && (
-          <div className="flex items-center justify-between p-3 bg-emerald-50/70 border border-emerald-200/60 rounded-2xl">
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl">{existingProfile.avatar}</span>
-              <div>
-                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
-                  Conta Local Existente
-                </span>
-                <span className="text-xs font-extrabold text-slate-800">
-                  {existingProfile.name}
-                </span>
-              </div>
-            </div>
-            <button
-              type="button"
-              id="btn-continue-existing-local"
-              onClick={handleUseExisting}
-              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition-all cursor-pointer"
-            >
-              Continuar
-            </button>
-          </div>
-        )}
-
         {/* Creation Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" id="form-create-local-account">
           <div className="flex flex-col gap-1">
@@ -137,7 +94,7 @@ export const LocalAccountModal: React.FC<LocalAccountModalProps> = ({
                 maxLength={20}
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="Ex: Convidado #42"
+                placeholder="Digite seu nome ou apelido..."
                 className="w-full bg-slate-50 hover:bg-white focus:bg-white text-slate-800 placeholder-slate-400 text-xs sm:text-sm font-semibold rounded-2xl pl-10 pr-4 py-2.5 border border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
               />
             </div>

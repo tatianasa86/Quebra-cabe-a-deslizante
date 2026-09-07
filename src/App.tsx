@@ -9,29 +9,13 @@ import { getAudioContext, playSlideSound } from './utils/audio';
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('welcome');
   const [player, setPlayer] = useState<PlayerProfile>({
-    name: 'Gamer',
+    name: '',
     avatar: '🚀',
   });
   const [themes, setThemes] = useState<ThemeItem[]>(INITIAL_THEMES);
   const [currentThemeIndex, setCurrentThemeIndex] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    try {
-      const savedGoogle = localStorage.getItem('sliding_puzzle_google_account');
-      if (savedGoogle) {
-        setPlayer(JSON.parse(savedGoogle));
-        return;
-      }
-      const savedLocal = localStorage.getItem('sliding_puzzle_local_profile');
-      if (savedLocal) {
-        setPlayer(JSON.parse(savedLocal));
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
 
   const handleToggleSound = () => {
     getAudioContext();

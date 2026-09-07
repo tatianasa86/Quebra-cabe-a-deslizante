@@ -25,35 +25,57 @@ export function playSlideSound(soundEnabled: boolean): void {
   const ctx = getAudioContext();
   if (!ctx) return;
 
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+
   try {
     const now = ctx.currentTime;
-    // Softer, gentle warm wooden/water droplet click
-    const pitchVariation = 0.96 + Math.random() * 0.08;
-    const baseFreq = 310 * pitchVariation;
 
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+    // Harmonious pentatonic pitches for a serene, soft marimba / water-drop tap
+    const notes = [440, 493.88, 523.25, 587.33, 659.25];
+    const pitch = notes[Math.floor(Math.random() * notes.length)] * (0.99 + Math.random() * 0.02);
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(190, now + 0.07);
+    // Primary fundamental oscillator (pure sine for smooth warmth)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
 
-    // Very gentle, soothing volume level (non-intrusive)
-    gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(0.08, now + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(pitch, now);
+    // Subtle, gentle micro slide downward gives it a soft fluid drop feel
+    osc1.frequency.exponentialRampToValueAtTime(pitch * 0.96, now + 0.11);
 
+    // Soft attack (7ms) and smooth exponential decay (120ms)
+    // Gain at 0.16 ensures it is clearly audible on all speakers while staying gentle and relaxing
+    gain1.gain.setValueAtTime(0.0001, now);
+    gain1.gain.linearRampToValueAtTime(0.16, now + 0.007);
+    gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+    // Secondary subtle overtone oscillator for natural presence on phone speakers
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(pitch * 2, now);
+    gain2.gain.setValueAtTime(0.0001, now);
+    gain2.gain.linearRampToValueAtTime(0.04, now + 0.005);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+    // Warm low-pass acoustic filter to remove any harshness or sharp edge
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(750, now);
-    filter.frequency.exponentialRampToValueAtTime(280, now + 0.07);
+    filter.frequency.setValueAtTime(1800, now);
+    filter.frequency.exponentialRampToValueAtTime(900, now + 0.12);
 
-    osc.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain1);
+    gain1.connect(ctx.destination);
 
-    osc.start(now);
-    osc.stop(now + 0.08);
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.13);
+    osc2.stop(now + 0.09);
   } catch (e) {
     console.warn('Audio play failed:', e);
   }
@@ -64,23 +86,27 @@ export function playInvalidSound(soundEnabled: boolean): void {
   const ctx = getAudioContext();
   if (!ctx) return;
 
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+
   try {
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
 
-    // Soft muted, gentle bump
+    // Soft, muted wooden bump
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(120, now);
-    osc.frequency.exponentialRampToValueAtTime(75, now + 0.09);
+    osc.frequency.setValueAtTime(190, now);
+    osc.frequency.exponentialRampToValueAtTime(120, now + 0.09);
 
     gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(0.05, now + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+    gainNode.gain.linearRampToValueAtTime(0.08, now + 0.008);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(220, now);
+    filter.frequency.setValueAtTime(400, now);
 
     osc.connect(filter);
     filter.connect(gainNode);

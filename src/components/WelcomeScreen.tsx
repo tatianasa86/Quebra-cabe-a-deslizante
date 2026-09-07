@@ -21,16 +21,28 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   soundEnabled,
   onToggleSound,
 }) => {
-  const [nickname, setNickname] = useState(player.name || 'Gamer');
+  const [nickname, setNickname] = useState(player.name || '');
   const [selectedAvatar, setSelectedAvatar] = useState(player.avatar || '🚀');
   const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
   const [isLocalModalOpen, setIsLocalModalOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const finalName = nickname.trim() || 'Jogador';
+    const finalName = nickname.trim();
+    if (!finalName) return;
     onUpdatePlayer({ ...player, name: finalName, avatar: selectedAvatar });
     onStartGame();
+  };
+
+  const handleClearAccount = () => {
+    setNickname('');
+    onUpdatePlayer({ name: '', avatar: '🚀', accountType: undefined });
+    try {
+      localStorage.removeItem('sliding_puzzle_google_account');
+      localStorage.removeItem('sliding_puzzle_local_profile');
+    } catch {
+      // ignore
+    }
   };
 
   const handleGoogleSuccess = (googleProfile: PlayerProfile) => {
@@ -70,18 +82,20 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               Versão 2.5 • Pro
             </span>
 
-            {player.accountType === 'google' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">
-                <CheckCircle2 className="w-3 h-3" />
-                Google
-              </span>
-            )}
-            {player.accountType === 'local' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-[10px] font-bold">
-                <CheckCircle2 className="w-3 h-3" />
-                Local
-              </span>
-            )}
+            {player.name ? (
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-bold">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <span className="max-w-[90px] truncate">{player.name}</span>
+                <button
+                  type="button"
+                  onClick={handleClearAccount}
+                  title="Limpar / Sair"
+                  className="text-slate-400 hover:text-red-600 transition-colors ml-0.5 text-xs font-black cursor-pointer leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            ) : null}
           </div>
 
           <button

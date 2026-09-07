@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Shield, User, ArrowRight } from 'lucide-react';
+import { X, Shield, ArrowRight, Mail, User } from 'lucide-react';
 import { PlayerProfile } from '../types';
 
 interface GoogleLoginModalProps {
@@ -14,41 +14,30 @@ export const GoogleLoginModal: React.FC<GoogleLoginModalProps> = ({
   onClose,
   onSuccessLogin,
 }) => {
-  const [customEmail, setCustomEmail] = useState('');
-  const [customName, setCustomName] = useState('');
-  const [isUsingCustomAccount, setIsUsingCustomAccount] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   if (!isOpen) return null;
 
-  // Preset Google accounts
-  const defaultGoogleAccount = {
-    name: 'Thiago Almeida',
-    email: 'tsalmeida569@gmail.com',
-    avatarLetter: 'T',
-    avatarBg: 'bg-emerald-600',
-  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!googleEmail.trim()) return;
 
-  const handleSelectAccount = (accountName: string, accountEmail: string) => {
     setIsProcessing(true);
+    const parsedName = displayName.trim() || googleEmail.split('@')[0];
+
     setTimeout(() => {
       const profile: PlayerProfile = {
-        name: accountName,
-        email: accountEmail,
+        name: parsedName,
+        email: googleEmail.trim(),
         avatar: '⭐',
         accountType: 'google',
       };
       localStorage.setItem('sliding_puzzle_google_account', JSON.stringify(profile));
       setIsProcessing(false);
       onSuccessLogin(profile);
-    }, 600);
-  };
-
-  const handleCustomSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customEmail) return;
-    const namePart = customName.trim() || customEmail.split('@')[0];
-    handleSelectAccount(namePart, customEmail.trim());
+    }, 400);
   };
 
   return (
@@ -58,7 +47,7 @@ export const GoogleLoginModal: React.FC<GoogleLoginModalProps> = ({
     >
       <div
         id="google-login-modal"
-        className="w-full max-w-[390px] bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 relative animate-in zoom-in-95 duration-200"
+        className="w-full max-w-[380px] bg-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 relative animate-in zoom-in-95 duration-200"
       >
         {/* Close Button */}
         <button
@@ -98,113 +87,76 @@ export const GoogleLoginModal: React.FC<GoogleLoginModalProps> = ({
             Fazer login com o Google
           </h3>
           <p className="text-xs text-slate-500 max-w-[280px]">
-            Selecione uma conta Google para salvar seu progresso e conquistas
+            Conecte sua conta para salvar recordes e sincronizar seu progresso
           </p>
         </div>
 
-        {/* Account Selector Section */}
-        {!isUsingCustomAccount ? (
-          <div className="flex flex-col gap-2.5 my-1">
-            {/* Detected / Recommended Google Account */}
-            <button
-              type="button"
-              id="btn-google-account-default"
-              disabled={isProcessing}
-              onClick={() =>
-                handleSelectAccount(defaultGoogleAccount.name, defaultGoogleAccount.email)
-              }
-              className="flex items-center gap-3 p-3 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 active:scale-[0.99] transition-all cursor-pointer text-left group"
-            >
-              <div
-                className={`w-10 h-10 rounded-full ${defaultGoogleAccount.avatarBg} text-white font-bold flex items-center justify-center text-sm shadow-xs flex-shrink-0`}
-              >
-                {defaultGoogleAccount.avatarLetter}
+        {/* Clean Login Form - Blank by default */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 my-1" id="form-google-auth">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="google-email-input" className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
+              E-mail do Google
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-3.5 flex items-center justify-center text-slate-400 pointer-events-none">
+                <Mail className="w-4 h-4" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold text-slate-800 group-hover:text-blue-700 truncate">
-                  {defaultGoogleAccount.name}
-                </div>
-                <div className="text-[11px] text-slate-500 truncate">
-                  {defaultGoogleAccount.email}
-                </div>
-              </div>
-              <div className="w-6 h-6 rounded-full bg-blue-100/70 text-blue-600 flex items-center justify-center">
-                <Check className="w-3.5 h-3.5" />
-              </div>
-            </button>
-
-            {/* Option to use another Google account */}
-            <button
-              type="button"
-              id="btn-use-other-google-account"
-              onClick={() => setIsUsingCustomAccount(true)}
-              className="flex items-center gap-3 p-3 rounded-2xl border border-dashed border-slate-300 hover:border-blue-400 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-all cursor-pointer text-left"
-            >
-              <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center flex-shrink-0">
-                <User className="w-4 h-4" />
-              </div>
-              <div className="flex-1">
-                <span>Usar outra conta do Google</span>
-              </div>
-            </button>
-          </div>
-        ) : (
-          /* Custom Google Account Form */
-          <form onSubmit={handleCustomSubmit} className="flex flex-col gap-3 my-1">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="google-email-input" className="text-[11px] font-bold text-slate-500">
-                E-mail do Google
-              </label>
               <input
                 id="google-email-input"
                 type="email"
                 required
-                value={customEmail}
-                onChange={(e) => setCustomEmail(e.target.value)}
+                value={googleEmail}
+                onChange={(e) => setGoogleEmail(e.target.value)}
                 placeholder="seuemail@gmail.com"
-                className="w-full px-3.5 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
+                className="w-full bg-slate-50 hover:bg-white focus:bg-white text-slate-800 placeholder-slate-400 text-xs sm:text-sm font-semibold rounded-2xl pl-10 pr-4 py-2.5 border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
               />
             </div>
+          </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="google-name-input" className="text-[11px] font-bold text-slate-500">
-                Nome de Exibição
-              </label>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="google-name-input" className="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1">
+              Nome de Exibição
+            </label>
+            <div className="relative flex items-center">
+              <div className="absolute left-3.5 flex items-center justify-center text-slate-400 pointer-events-none">
+                <User className="w-4 h-4" />
+              </div>
               <input
                 id="google-name-input"
                 type="text"
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                placeholder="Ex: Carlos Oliveira"
-                className="w-full px-3.5 py-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Digite seu nome (opcional)..."
+                className="w-full bg-slate-50 hover:bg-white focus:bg-white text-slate-800 placeholder-slate-400 text-xs sm:text-sm font-semibold rounded-2xl pl-10 pr-4 py-2.5 border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
               />
             </div>
+          </div>
 
-            <div className="flex gap-2 mt-1">
-              <button
-                type="button"
-                onClick={() => setIsUsingCustomAccount(false)}
-                className="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 cursor-pointer transition-colors"
-              >
-                Voltar
-              </button>
-              <button
-                type="submit"
-                disabled={isProcessing}
-                className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer flex items-center justify-center gap-1.5 transition-all"
-              >
-                <span>Conectar</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </form>
-        )}
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2.5 rounded-2xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 cursor-pointer transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={isProcessing || !googleEmail.trim()}
+              className="flex-1 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-blue-500/20 cursor-pointer flex items-center justify-center gap-1.5 transition-all"
+            >
+              <span>{isProcessing ? 'Conectando...' : 'Fazer Login'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </form>
 
         {/* Privacy reassurance */}
-        <div className="flex items-start gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-[10.5px] text-slate-500 leading-snug">
+        <div className="flex items-start gap-2 p-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-[10.5px] text-slate-500 leading-snug">
           <Shield className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
           <span>
-            Ao prosseguir, você fará login de forma segura e seus recordes serão vinculados à sua conta Google.
+            Seus dados são protegidos e seu nome só será exibido após a confirmação do login.
           </span>
         </div>
       </div>
