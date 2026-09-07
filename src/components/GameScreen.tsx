@@ -188,17 +188,17 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     <main
       id="game-screen"
       data-purpose="puzzle-app-container"
-      className="w-full max-w-[420px] bg-white/95 backdrop-blur-xl rounded-[36px] p-5 sm:p-6 shadow-2xl border border-white/80 flex flex-col gap-4 sm:gap-5 relative z-10 overflow-hidden"
+      className="w-full max-w-[400px] bg-white/95 backdrop-blur-xl rounded-3xl p-3.5 sm:p-4.5 shadow-2xl border border-white/80 flex flex-col gap-2.5 sm:gap-3.5 relative z-10 overflow-hidden my-auto"
     >
       {/* Top Header & Navigation Bar */}
-      <header className="text-center pt-1 relative flex flex-col" data-purpose="game-header">
-        <div className="flex items-center justify-between mb-2">
+      <header className="text-center pt-0.5 relative flex flex-col" data-purpose="game-header">
+        <div className="flex items-center justify-between mb-1.5">
           {/* Back to Home / Login Button */}
           <button
             type="button"
             id="btn-back-menu"
             onClick={onBackToMenu}
-            className="px-3 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200/90 active:scale-95 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 border border-slate-200/70 shadow-xs cursor-pointer"
+            className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200/90 active:scale-95 text-slate-700 text-xs font-bold transition-all flex items-center gap-1 border border-slate-200/70 shadow-xs cursor-pointer"
             title="Voltar ao Início"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
@@ -208,14 +208,20 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           {/* Personalized Player Badge */}
           <div
             id="player-banner"
-            className="flex items-center gap-1.5 bg-blue-50 border border-blue-200/80 px-3 py-1 rounded-2xl shadow-xs"
+            className="flex items-center gap-1.5 bg-blue-50 border border-blue-200/80 px-2.5 py-1 rounded-xl shadow-xs"
           >
-            <span id="player-avatar-badge" className="text-sm">
-              {player.avatar || '🚀'}
-            </span>
+            {player.accountType === 'google' ? (
+              <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-black">
+                G
+              </span>
+            ) : (
+              <span id="player-avatar-badge" className="text-sm">
+                {player.avatar || '🚀'}
+              </span>
+            )}
             <span
               id="player-name-badge"
-              className="text-xs font-extrabold text-blue-700 max-w-[120px] truncate"
+              className="text-xs font-extrabold text-blue-700 max-w-[110px] truncate"
             >
               {player.name || 'Jogador'}
             </span>
@@ -228,12 +234,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             onClick={onToggleSound}
             aria-label="Alternar som"
             title={soundEnabled ? 'Som Ativado' : 'Som Desativado'}
-            className="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 text-slate-600 transition-all flex items-center justify-center border border-slate-200/60 shadow-xs cursor-pointer"
+            className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 text-slate-600 transition-all flex items-center justify-center border border-slate-200/60 shadow-xs cursor-pointer"
           >
             {soundEnabled ? (
-              <Volume2 className="w-4 h-4 text-blue-600" />
+              <Volume2 className="w-3.5 h-3.5 text-blue-600" />
             ) : (
-              <VolumeX className="w-4 h-4 text-slate-400" />
+              <VolumeX className="w-3.5 h-3.5 text-slate-400" />
             )}
           </button>
         </div>

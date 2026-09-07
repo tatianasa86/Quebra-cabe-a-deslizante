@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Layers } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { GameScreen } from './components/GameScreen';
 import { CustomPhotoModal } from './components/CustomPhotoModal';
@@ -17,6 +16,22 @@ export default function App() {
   const [currentThemeIndex, setCurrentThemeIndex] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const savedGoogle = localStorage.getItem('sliding_puzzle_google_account');
+      if (savedGoogle) {
+        setPlayer(JSON.parse(savedGoogle));
+        return;
+      }
+      const savedLocal = localStorage.getItem('sliding_puzzle_local_profile');
+      if (savedLocal) {
+        setPlayer(JSON.parse(savedLocal));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleToggleSound = () => {
     getAudioContext();
@@ -63,7 +78,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-3 sm:p-5 overflow-x-hidden">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center p-2 sm:p-4 overflow-hidden select-none">
       {/* Ambient background glowing orbs */}
       <div className="orb orb-1" />
       <div className="orb orb-2" />
@@ -119,15 +134,6 @@ export default function App() {
         onClose={() => setIsPhotoModalOpen(false)}
         onApplyImage={handleApplyCustomImage}
       />
-
-      {/* Bottom Brand Indicator */}
-      <aside
-        id="puzzle-studio-mobile-footer"
-        className="mt-4 text-[11px] font-semibold text-slate-500 tracking-wide uppercase flex items-center gap-1.5 opacity-80 z-10"
-      >
-        <Layers className="w-3.5 h-3.5" />
-        <span>Puzzle Studio Mobile</span>
-      </aside>
     </div>
   );
 }

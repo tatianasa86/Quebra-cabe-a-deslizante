@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 }
 
 /* Animated Background Ambient Orbs */
 .orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(75px);
-  opacity: 0.65;
+  opacity: 0.55;
   pointer-events: none;
   z-index: 0;
   animation: orb-float 14s ease-in-out infinite alternate;

@@ -12,6 +12,9 @@ export interface ThemeItem {
 export interface PlayerProfile {
   name: string;
   avatar: string;
+  email?: string;
+  accountType?: 'guest' | 'local' | 'google';
+  photoUrl?: string;
 }
 
 export type ScreenType = 'welcome' | 'game';
