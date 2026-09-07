@@ -1,0 +1,6 @@
+{
+  "name": "Quebra-Cabeça Deslizante",
+  "description": "Jogo interativo de quebra-cabeça deslizante com temas de paisagens naturais, fotos personalizadas, efeitos sonoros e níveis de dificuldade.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
