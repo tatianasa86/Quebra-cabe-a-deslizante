@@ -26,7 +26,7 @@ export function createSolvableShuffle(size: number): number[] {
   const tiles = Array.from({ length: total }, (_, i) => i);
   const emptyVal = total - 1;
   let emptyIdx = total - 1;
-  const shuffleSteps = total * 18;
+  const shuffleSteps = size === 3 ? 8 : total * 18;
   let lastIdx = -1;
 
   for (let step = 0; step < shuffleSteps; step++) {

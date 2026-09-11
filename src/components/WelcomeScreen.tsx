@@ -218,7 +218,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               className="flex-1 py-2 px-2.5 rounded-xl bg-slate-100/90 hover:bg-emerald-50 active:bg-slate-200 text-slate-700 hover:text-emerald-700 font-bold text-[11px] transition-all border border-slate-200/70 hover:border-emerald-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
             >
               <User className="w-3 h-3 text-slate-500" />
-              <span>Entrar Convidado</span>
+              <span>Entrar como convidado</span>
             </button>
 
             <button
@@ -228,7 +228,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               className="flex-1 py-2 px-2.5 rounded-xl bg-slate-100/90 hover:bg-blue-50 active:bg-slate-200 text-slate-700 hover:text-blue-700 font-bold text-[11px] transition-all border border-slate-200/70 hover:border-blue-300 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Sparkles className="w-3 h-3 text-amber-500" />
-              <span>Google Connect</span>
+              <span>Entrar com Google</span>
             </button>
           </div>
 

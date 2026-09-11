@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import {
   ArrowLeft,
+  ArrowRight,
   Volume2,
   VolumeX,
   Footprints,
@@ -29,6 +30,7 @@ interface GameScreenProps {
   themes: ThemeItem[];
   currentThemeIndex: number;
   onSelectTheme: (index: number) => void;
+  onNextPhase: () => void;
   onOpenCustomPhotoModal: () => void;
   onBackToMenu: () => void;
   soundEnabled: boolean;
@@ -40,6 +42,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   themes,
   currentThemeIndex,
   onSelectTheme,
+  onNextPhase,
   onOpenCustomPhotoModal,
   onBackToMenu,
   soundEnabled,
@@ -199,10 +202,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             id="btn-back-menu"
             onClick={onBackToMenu}
             className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200/90 active:scale-95 text-slate-700 text-xs font-bold transition-all flex items-center gap-1 border border-slate-200/70 shadow-xs cursor-pointer"
-            title="Voltar ao Início"
+            title="Voltar ao Login"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
-            <span>Início</span>
+            <span>Login</span>
           </button>
 
           {/* Personalized Player Badge */}
@@ -427,12 +430,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 gap-2 w-full max-w-[300px]">
               <button
                 type="button"
                 id="btn-play-again"
                 onClick={() => restartGame(gridSize)}
-                className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                className="px-3 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-blue-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-white" />
                 <span>Jogar Novamente</span>
@@ -440,9 +443,19 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
               <button
                 type="button"
+                id="btn-next-phase"
+                onClick={onNextPhase}
+                className="px-3 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Próxima Fase</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                type="button"
                 id="btn-victory-menu"
                 onClick={onBackToMenu}
-                className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-2xl border border-slate-200/80 active:scale-95 transition-all cursor-pointer"
+                className="col-span-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-2xl border border-slate-200/80 active:scale-95 transition-all cursor-pointer"
               >
                 <span>Menu</span>
               </button>

@@ -44,6 +44,12 @@ export default function App() {
     setCurrentThemeIndex(index);
   };
 
+  const handleNextPhase = () => {
+    getAudioContext();
+    playSlideSound(soundEnabled);
+    setCurrentThemeIndex((currentIndex) => (currentIndex + 1) % themes.length);
+  };
+
   const handleApplyCustomImage = (imageUrl: string, themeName: string) => {
     getAudioContext();
     const newCustomTheme: ThemeItem = {
@@ -105,6 +111,7 @@ export default function App() {
           themes={themes}
           currentThemeIndex={currentThemeIndex}
           onSelectTheme={handleSelectTheme}
+          onNextPhase={handleNextPhase}
           onOpenCustomPhotoModal={() => setIsPhotoModalOpen(true)}
           onBackToMenu={handleBackToMenu}
           soundEnabled={soundEnabled}
