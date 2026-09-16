@@ -1,47 +1,53 @@
 import { ThemeItem } from '../types';
+import alpineLakeCabin from '../assets/images/alpine_lake_cabin_1788738615006.jpg';
+import cosmicSpaceAstronaut from '../assets/images/cosmic_space_astronaut_1788738647647.jpg';
+import cyberpunkNeonCity from '../assets/images/cyberpunk_neon_city_1788738659878.jpg';
+import detectiveDogLibrary from '../assets/images/detective_dog_library_1788738510488.jpg';
+import magicalFairyCottage from '../assets/images/magical_fairy_cottage_1788738602523.jpg';
+import tropicalRiverValley from '../assets/images/tropical_river_valley_1788738637888.jpg';
 
 export const INITIAL_THEMES: ThemeItem[] = [
   {
     id: 'cosmic-astronaut',
     name: 'Astronauta no Espaço',
     title: 'Edição Astronauta Cósmico',
-    url: '/imagem1.jpg',
-    thumb: '/imagem1.jpg',
+    url: cosmicSpaceAstronaut,
+    thumb: cosmicSpaceAstronaut,
   },
   {
     id: 'fairy-cottage',
     name: 'Cabana Encantada',
     title: 'Edição Cabana Encantada na Floresta',
-    url: '/imagem 2.jpg',
-    thumb: '/imagem 2.jpg',
+    url: magicalFairyCottage,
+    thumb: magicalFairyCottage,
   },
   {
     id: 'tropical-mountain-river',
     name: 'Vale Tropical',
     title: 'Edição Vale Tropical & Rio de Pedras',
-    url: '/imagem, 5.jpg',
-    thumb: '/imagem, 5.jpg',
+    url: tropicalRiverValley,
+    thumb: tropicalRiverValley,
   },
   {
     id: 'cyberpunk-neon-city',
     name: 'Metrópole Cyberpunk',
     title: 'Edição Cyberpunk Futurista',
-    url: '/imagem4.jpg',
-    thumb: '/imagem4.jpg',
+    url: cyberpunkNeonCity,
+    thumb: cyberpunkNeonCity,
   },
   {
     id: 'detective-dog',
     name: 'Cão Detetive',
     title: 'Edição Cão Detetive na Biblioteca',
-    url: '/Gemini_Generated_Image_w3cykqw3cykqw3cy.jpg',
-    thumb: '/Gemini_Generated_Image_w3cykqw3cykqw3cy.jpg',
+    url: detectiveDogLibrary,
+    thumb: detectiveDogLibrary,
   },
   {
     id: 'alpine-lake-sunset',
     name: 'Lago Alpino & Barco',
     title: 'Edição Lago Alpino ao Entardecer',
-    url: '/imagem 6.jpg',
-    thumb: '/imagem 6.jpg',
+    url: alpineLakeCabin,
+    thumb: alpineLakeCabin,
   },
   {
     id: 'tropical-island',
