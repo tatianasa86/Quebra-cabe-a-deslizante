@@ -61,6 +61,11 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [won, setWon] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showNumbers, setShowNumbers] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [hintsRemaining, setHintsRemaining] = useState(3);
+  const [hintTileIndex, setHintTileIndex] = useState<number | null>(null);
   const [coins, setCoins] = useState(120);
   const [lives, setLives] = useState(3);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -84,14 +89,17 @@ export default function App() {
     setSeconds(0);
     setWon(false);
     setGameOver(false);
+    setIsPaused(false);
+    setHintsRemaining(3);
+    setHintTileIndex(null);
     setPlaying(true);
   };
 
   useEffect(() => {
-    if (!playing || won || gameOver) return;
+    if (!playing || won || gameOver || isPaused) return;
     const timer = window.setInterval(() => setSeconds((value) => value + 1), 1000);
     return () => window.clearInterval(timer);
-  }, [playing, won, gameOver]);
+  }, [playing, won, gameOver, isPaused]);
 
   const handleStartGame = () => {
     const playerName = nickname.trim() || "Jogador";
@@ -127,7 +135,8 @@ export default function App() {
   };
 
   const handleTileClick = (index: number) => {
-    if (!playing || won || gameOver) return;
+    if (!playing || won || gameOver || isPaused) return;
+    setHintTileIndex(null);
 
     const emptyIndex = board.indexOf(board.length - 1);
     if (!neighbors(emptyIndex, difficulty).includes(index)) {
@@ -158,6 +167,26 @@ export default function App() {
     }
   };
 
+  const handleHint = () => {
+    if (hintsRemaining <= 0 || !playing || won || gameOver || isPaused) return;
+
+    const emptyIndex = board.indexOf(board.length - 1);
+    const bestMove = neighbors(emptyIndex, difficulty)
+      .map((position) => {
+        const tile = board[position];
+        const targetRow = Math.floor(tile / difficulty);
+        const targetCol = tile % difficulty;
+        const distance = Math.abs(targetRow - Math.floor(emptyIndex / difficulty))
+          + Math.abs(targetCol - (emptyIndex % difficulty));
+        return { position, distance };
+      })
+      .sort((first, second) => first.distance - second.distance)[0];
+
+    if (!bestMove) return;
+    setHintTileIndex(bestMove.position);
+    setHintsRemaining((remaining) => remaining - 1);
+  };
+
   const resetGame = () => {
     setScreen("welcome");
     setNickname("Jogador");
@@ -171,6 +200,9 @@ export default function App() {
     setSeconds(0);
     setWon(false);
     setGameOver(false);
+    setIsPaused(false);
+    setHintsRemaining(3);
+    setHintTileIndex(null);
     setPlaying(false);
   };
 
@@ -326,11 +358,20 @@ export default function App() {
               <small>Imagem atual</small>
               <strong>{activeTheme.name}</strong>
             </div>
+            <button
+              type="button"
+              className="preview-button"
+              onClick={() => setIsPreviewOpen(true)}
+              aria-label="Visualizar imagem completa"
+              title="Visualizar imagem completa"
+            >
+              Ver imagem
+            </button>
           </div>
 
           <div className="metrics">
             <div className="metric-box">
-              <span>Tempo</span>
+              <span>{isPaused ? "Pausado" : "Tempo"}</span>
               <b>{formatTime(seconds)}</b>
             </div>
             <div className="metric-box">
@@ -366,6 +407,40 @@ export default function App() {
             ))}
           </div>
 
+          <div className="game-tools" aria-label="Ações da partida">
+            <button
+              type="button"
+              onClick={() => startRound(difficulty, level)}
+              disabled={!playing || won || gameOver}
+            >
+              Embaralhar
+            </button>
+            <button
+              type="button"
+              onClick={handleHint}
+              disabled={hintsRemaining === 0 || !playing || won || gameOver || isPaused}
+            >
+              Dica <span>{hintsRemaining}/3</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPaused((paused) => !paused)}
+              disabled={!playing || won || gameOver}
+              aria-pressed={isPaused}
+            >
+              {isPaused ? "Continuar" : "Pausar"}
+            </button>
+          </div>
+
+          <label className="number-toggle">
+            <input
+              type="checkbox"
+              checked={showNumbers}
+              onChange={(event) => setShowNumbers(event.target.checked)}
+            />
+            <span>Mostrar números nas peças</span>
+          </label>
+
           <div className="board-panel">
             <div
               className="puzzle-board"
@@ -380,7 +455,12 @@ export default function App() {
                   <button
                     key={`${tile}-${index}`}
                     type="button"
-                    className={isEmpty ? "tile empty" : "tile"}
+                    className={[
+                      "tile",
+                      isEmpty ? "empty" : "",
+                      !isEmpty && tile === index ? "correct" : "",
+                      !isEmpty && index === hintTileIndex ? "hinted" : "",
+                    ].filter(Boolean).join(" ")}
                     onClick={() => handleTileClick(index)}
                     style={
                       isEmpty
@@ -391,8 +471,10 @@ export default function App() {
                             backgroundPosition: `${(col / (difficulty - 1)) * 100}% ${(row / (difficulty - 1)) * 100}%`,
                           }
                     }
-                    aria-label={isEmpty ? "Espaço vazio" : `Peça ${tile + 1}`}
-                  />
+                    aria-label={isEmpty ? "Espaço vazio" : `Peça ${tile + 1}${tile === index ? ", posição correta" : ""}`}
+                  >
+                    {showNumbers && !isEmpty && <span className="tile-number">{tile + 1}</span>}
+                  </button>
                 );
               })}
             </div>
@@ -432,6 +514,31 @@ export default function App() {
             )}
           </div>
         </section>
+      )}
+
+      {isPreviewOpen && (
+        <div
+          className="image-preview-overlay"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setIsPreviewOpen(false);
+          }}
+        >
+          <section
+            className="image-preview-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-preview-title"
+          >
+            <div className="image-preview-header">
+              <h2 id="image-preview-title">{activeTheme.name}</h2>
+              <button type="button" onClick={() => setIsPreviewOpen(false)} aria-label="Fechar pré-visualização">
+                ×
+              </button>
+            </div>
+            <img src={activeTheme.url} alt={`Imagem completa: ${activeTheme.name}`} />
+          </section>
+        </div>
       )}
 
       {isGoogleLoginOpen && (

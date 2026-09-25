@@ -697,7 +697,34 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #eff6ff, #faf5ff);
+  background: #edf4fa;
+  border: 1px solid #cbd8e5;
+  color: #172033;
+  padding: 10px;
+  border-radius: 16px;
+}
+
+.active-theme-banner small {
+  color: #526174;
+}
+
+.preview-button {
+  margin-left: auto;
+  flex: 0 0 auto;
+  border: 1px solid #b7c7d8;
+  border-radius: 9px;
+  padding: 7px 9px;
+  color: #1e40af;
+  background: #fff;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.preview-button:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
 }
 
 .level-badge {
@@ -715,11 +742,12 @@ body {
 }
 
 .metric-box {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.88));
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #eaf1f8;
+  border: 1px solid #c7d5e4;
   border-radius: 16px;
   text-align: center;
   padding: 12px 10px;
+  color: #172033;
 }
 
 .metric-box span {
@@ -727,7 +755,7 @@ body {
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: #526174;
   text-transform: uppercase;
 }
 
@@ -735,6 +763,7 @@ body {
   display: block;
   margin-top: 6px;
   font-size: 1.2rem;
+  color: #102a43;
 }
 
 .progress-area {
@@ -788,6 +817,61 @@ body {
   color: white;
 }
 
+.game-tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.game-tools button {
+  min-height: 38px;
+  border: 1px solid #c3d0df;
+  border-radius: 11px;
+  padding: 7px 5px;
+  color: #273449;
+  background: #f8fafc;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
+}
+
+.game-tools button:hover:not(:disabled) {
+  border-color: #60a5fa;
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.game-tools button:disabled {
+  color: #8996a7;
+  background: #edf1f5;
+  cursor: not-allowed;
+}
+
+.game-tools button span {
+  color: #526174;
+  font-variant-numeric: tabular-nums;
+}
+
+.number-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 24px;
+  color: #dce7f2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.number-toggle input {
+  width: 15px;
+  height: 15px;
+  accent-color: #60a5fa;
+}
+
 .board-panel {
   position: relative;
   width: 100%;
@@ -802,16 +886,22 @@ body {
   width: 100%;
   height: 100%;
   display: grid;
-  gap: 4px;
+  gap: 3px;
   border-radius: 18px;
   overflow: hidden;
-  background: rgba(148, 163, 184, 0.2);
-  padding: 4px;
+  background: #d5e0eb;
+  padding: 3px;
 }
 
 .tile {
-  border: 0;
-  border-radius: 10px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 8px;
+  padding: 0;
   background-color: rgba(51, 65, 85, 0.7);
   background-repeat: no-repeat;
   background-position: center;
@@ -823,6 +913,38 @@ body {
   filter: brightness(1.08);
   transform: translateY(-1px);
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+}
+
+.tile.correct {
+  box-shadow: inset 0 0 0 2px rgba(190, 242, 100, 0.95), inset 0 0 13px rgba(163, 230, 53, 0.3);
+}
+
+.tile.hinted {
+  z-index: 1;
+  border-color: #fff;
+  box-shadow: inset 0 0 0 3px #facc15, 0 0 16px rgba(250, 204, 21, 0.75);
+  animation: hintPulse 0.9s ease-in-out infinite alternate;
+}
+
+.tile-number {
+  display: grid;
+  place-items: center;
+  width: clamp(22px, 10vw, 36px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.78);
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.4);
+  font-size: clamp(0.68rem, 2.4vw, 0.92rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+@keyframes hintPulse {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.22); }
 }
 
 .tile.empty {
@@ -902,9 +1024,87 @@ body {
 
 .loss { background: rgba(31, 41, 55, 0.92); }
 
+.image-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(8, 15, 27, 0.84);
+  backdrop-filter: blur(6px);
+}
+
+.image-preview-dialog {
+  width: min(100%, 760px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: #111827;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.image-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #f8fafc;
+}
+
+.image-preview-header h2 {
+  overflow: hidden;
+  margin: 0;
+  font-size: 0.95rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-preview-header button {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  color: #fff;
+  background: #1e293b;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.image-preview-dialog > img {
+  width: 100%;
+  max-height: calc(90vh - 80px);
+  object-fit: contain;
+  border-radius: 9px;
+  background: #0b1020;
+}
+
 @media (max-width: 520px) {
   .welcome-card,
   .game-card { padding: 14px; border-radius: 22px; }
   .theme-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .avatar-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .active-theme-banner { gap: 8px; }
+  .preview-button { padding: 7px; }
+}
+
+@media (max-height: 760px) {
+  .app-shell { padding-top: 34px; padding-bottom: 18px; }
+  .game-card { gap: 9px; padding: 10px; }
+  .headline-row { padding: 4px 2px; }
+  .active-theme-banner { padding: 7px; }
+  .active-theme-banner img { width: 46px; height: 46px; }
+  .metrics { gap: 6px; }
+  .metric-box { padding: 7px 5px; }
+  .progress-area { padding: 8px 10px; }
+  .progress-label-row { margin-bottom: 6px; }
+  .difficulty { padding: 7px; }
+  .game-tools button { min-height: 34px; }
+  .number-toggle { min-height: 18px; }
+  .board-panel { width: min(100%, calc(100vh - 450px)); margin-inline: auto; }
 }
