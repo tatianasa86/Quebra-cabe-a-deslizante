@@ -48,7 +48,10 @@ export default function App() {
   const [screen, setScreen] = useState<ScreenState>("welcome");
   const [isSplashVisible, setIsSplashVisible] = useState(true);
   const [nickname, setNickname] = useState("Jogador");
-  const [avatar, setAvatar] = useState("🚀");
+  const [avatar, setAvatar] = useState("😀");
+  const [isGoogleLoginOpen, setIsGoogleLoginOpen] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState("");
+  const [googleDisplayName, setGoogleDisplayName] = useState("");
   const [themeIndex, setThemeIndex] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>(3);
   const [level, setLevel] = useState(1);
@@ -97,6 +100,25 @@ export default function App() {
     setNickname(playerName);
   };
 
+  const handleGuestStart = () => {
+    setNickname("Convidado");
+    setAvatar("🙂");
+    setScreen("game");
+    startRound(difficulty, level);
+  };
+
+  const handleGoogleStart = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const email = googleEmail.trim();
+    if (!email) return;
+
+    setNickname(googleDisplayName.trim() || email.split("@")[0]);
+    setAvatar("😀");
+    setIsGoogleLoginOpen(false);
+    setScreen("game");
+    startRound(difficulty, level);
+  };
+
   const handleNextLevel = () => {
     const nextLevel = level + 1;
     const nextDifficulty: Difficulty = nextLevel % 3 === 0 ? 5 : nextLevel % 2 === 0 ? 4 : 3;
@@ -139,7 +161,7 @@ export default function App() {
   const resetGame = () => {
     setScreen("welcome");
     setNickname("Jogador");
-    setAvatar("🚀");
+    setAvatar("😀");
     setLives(3);
     setCoins(120);
     setLevel(1);
@@ -170,7 +192,7 @@ export default function App() {
       {screen === "welcome" ? (
         <section className="welcome-card">
           <div className="welcome-topbar">
-            <span className="badge">Versão Pro</span>
+            <span className="badge">Versão 2.5 • Pro</span>
             <button
               type="button"
               className="sound-toggle"
@@ -189,6 +211,23 @@ export default function App() {
             <p>Desafie seu raciocínio com paisagens, níveis e imagens incríveis.</p>
           </div>
 
+          <section className="login-access" aria-labelledby="login-access-title">
+            <div className="section-heading">
+              <h2 id="login-access-title">Acesso rápido</h2>
+              <p>Entre como convidado ou continue com seu perfil Google.</p>
+            </div>
+            <div className="login-access-buttons">
+              <button type="button" className="access-button guest" onClick={handleGuestStart}>
+                <span className="access-symbol" aria-hidden="true">●</span>
+                <span>Entrar como convidado</span>
+              </button>
+              <button type="button" className="access-button google" onClick={() => setIsGoogleLoginOpen(true)}>
+                <span className="google-mark" aria-hidden="true">G</span>
+                <span>Entrar com Google</span>
+              </button>
+            </div>
+          </section>
+
           <div className="theme-preview-card">
             <img src={activeTheme.thumb} alt={activeTheme.name} />
             <div>
@@ -198,7 +237,13 @@ export default function App() {
           </div>
 
           <div className="player-box">
-            <label htmlFor="nickname">Nome do jogador</label>
+            <div className="section-heading">
+              <h2>Personalizar perfil</h2>
+              <p>Escolha como seu nome e avatar aparecerão durante o jogo.</p>
+            </div>
+            <label htmlFor="nickname">
+              Apelido do jogador <span className="optional-label">Opcional</span>
+            </label>
             <input
               id="nickname"
               value={nickname}
@@ -208,13 +253,14 @@ export default function App() {
             />
 
             <div className="avatar-picker">
-              {['🚀', '🦁', '⚡', '🏝️', '👾', '🦊', '🐼', '🌟'].map((option) => (
+              {['😀', '😎', '🤓', '🥳', '😴', '🥺', '😈', '👽'].map((option) => (
                 <button
                   key={option}
                   type="button"
                   className={avatar === option ? "avatar active" : "avatar"}
                   onClick={() => setAvatar(option)}
                   aria-label={`Avatar ${option}`}
+                  aria-pressed={avatar === option}
                 >
                   {option}
                 </button>
@@ -242,8 +288,9 @@ export default function App() {
           </div>
 
           <button type="button" className="start-button" onClick={handleStartGame}>
-            Iniciar jogo
+            Jogar com este perfil
           </button>
+          <p className="security-note">Jogo seguro. Você também pode jogar sem criar um perfil.</p>
         </section>
       ) : (
         <section className="game-card">
@@ -385,6 +432,54 @@ export default function App() {
             )}
           </div>
         </section>
+      )}
+
+      {isGoogleLoginOpen && (
+        <div className="login-overlay" role="presentation" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setIsGoogleLoginOpen(false);
+        }}>
+          <section
+            className="login-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="google-login-title"
+          >
+            <button
+              type="button"
+              className="dialog-close"
+              onClick={() => setIsGoogleLoginOpen(false)}
+              aria-label="Fechar"
+            >
+              ×
+            </button>
+            <span className="google-mark dialog-google-mark" aria-hidden="true">G</span>
+            <h2 id="google-login-title">Entrar com Google</h2>
+            <p>Use o nome do seu perfil para continuar jogando neste dispositivo.</p>
+            <form onSubmit={handleGoogleStart}>
+              <label htmlFor="google-email">E-mail</label>
+              <input
+                id="google-email"
+                type="email"
+                autoComplete="email"
+                required
+                value={googleEmail}
+                onChange={(event) => setGoogleEmail(event.target.value)}
+                placeholder="voce@gmail.com"
+              />
+              <label htmlFor="google-display-name">Nome de exibição</label>
+              <input
+                id="google-display-name"
+                type="text"
+                autoComplete="name"
+                maxLength={18}
+                value={googleDisplayName}
+                onChange={(event) => setGoogleDisplayName(event.target.value)}
+                placeholder="Opcional"
+              />
+              <button type="submit" className="dialog-submit">Continuar</button>
+            </form>
+          </section>
+        </div>
       )}
     </main>
   );

@@ -32,7 +32,7 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px 16px 42px;
+  padding: 24px 16px 64px;
   position: relative;
 }
 
@@ -123,7 +123,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 30px;
   box-shadow: 0 30px 80px rgba(15, 23, 42, 0.32);
-  padding: 18px;
+  padding: 24px;
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(12px);
@@ -143,7 +143,146 @@ body {
 .welcome-card {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
+  color: #1e293b;
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #e2e8f0;
+}
+
+.welcome-card .badge {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.welcome-card .sound-toggle {
+  color: #334155;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.welcome-card .theme-preview-card,
+.welcome-card .player-box,
+.welcome-card .theme-picker {
+  background: #f8fafc;
+  border-color: #dbe3ed;
+}
+
+.welcome-card .theme-preview-card small {
+  color: #526174;
+}
+
+.welcome-card .player-box label,
+.welcome-card .section-label-row span {
+  color: #475569;
+}
+
+.welcome-card .player-box input {
+  color: #172033;
+  background: #fff;
+  border-color: #cbd5e1;
+}
+
+.welcome-card .player-box input::placeholder {
+  color: #64748b;
+}
+
+.login-access {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #dbe3ed;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.section-heading p {
+  margin: 3px 0 0;
+  color: #526174;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.login-access-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.access-button {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  color: #273449;
+  background: white;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.access-button:hover {
+  border-color: #60a5fa;
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.access-symbol {
+  position: relative;
+  width: 17px;
+  height: 17px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.access-symbol::before,
+.access-symbol::after {
+  content: "";
+  position: absolute;
+  background: #475569;
+}
+
+.access-symbol::before {
+  top: 1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.access-symbol::after {
+  bottom: 1px;
+  width: 12px;
+  height: 7px;
+  border-radius: 7px 7px 4px 4px;
+}
+
+.google-mark {
+  width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: white;
+  color: #4285f4;
+  font: 900 0.84rem Arial, sans-serif;
+  flex: 0 0 auto;
 }
 
 .welcome-topbar,
@@ -289,6 +428,15 @@ body {
   color: #64748b;
 }
 
+.optional-label {
+  margin-left: 6px;
+  color: #475569;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .player-box input {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.2);
@@ -312,18 +460,123 @@ body {
 }
 
 .avatar {
+  width: 100%;
+  aspect-ratio: 1;
   border: 2px solid transparent;
-  background: rgba(15, 23, 42, 0.45);
+  background: #f1f5f9;
   border-radius: 12px;
-  font-size: 1.3rem;
-  padding: 8px 0;
+  font-size: 1.25rem;
+  padding: 0;
+  cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .avatar.active {
-  border-color: var(--primary);
-  background: rgba(96, 165, 250, 0.18);
+  border-color: #2563eb;
+  background: #dbeafe;
   transform: translateY(-1px);
+}
+
+.security-note {
+  margin: -4px 0 0;
+  color: #526174;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(5px);
+}
+
+.login-dialog {
+  width: min(100%, 380px);
+  position: relative;
+  padding: 26px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.3);
+}
+
+.dialog-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: #526174;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.dialog-google-mark {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #dbe3ed;
+  font-size: 1.1rem;
+}
+
+.login-dialog h2 {
+  margin: 12px 0 4px;
+  color: #172033;
+  font-size: 1.15rem;
+}
+
+.login-dialog p {
+  margin: 0 0 18px;
+  color: #526174;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.login-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-dialog label {
+  margin-top: 4px;
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.login-dialog input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 11px 12px;
+  color: #172033;
+  background: #f8fafc;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.login-dialog input:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.18);
+  border-color: #2563eb;
+}
+
+.dialog-submit {
+  margin-top: 10px;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px;
+  color: white;
+  background: #2563eb;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .theme-grid {
@@ -364,10 +617,26 @@ body {
   padding: 14px 16px;
   font-size: 0.95rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-transform: uppercase;
   box-shadow: 0 20px 30px rgba(96, 165, 250, 0.22);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+@media (max-width: 420px) {
+  .welcome-card,
+  .game-card {
+    padding: 18px;
+  }
+
+  .login-access {
+    padding: 10px;
+  }
+
+  .access-button {
+    min-height: 52px;
+    padding-inline: 6px;
+  }
 }
 
 .start-button:hover,
