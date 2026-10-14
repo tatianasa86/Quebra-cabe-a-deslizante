@@ -1,0 +1,8 @@
+{
+  "name": "quebra-cabeca-deslizante-root",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "workspaces": [
+    "quebra-cabeca-deslizante"
+  ]
+}
