@@ -4,6 +4,86 @@ import { playInvalidSound, playSlideSound, playVictoryFanfare } from "./utils/au
 
 type Difficulty = 3 | 4 | 5;
 type ScreenState = "welcome" | "game";
+const PROGRESS_STORAGE_KEY = "sliding_puzzle_progress";
+
+interface SavedProgress {
+  screen: ScreenState;
+  nickname: string;
+  avatar: string;
+  googleEmail: string;
+  googleDisplayName: string;
+  themeIndex: number;
+  difficulty: Difficulty;
+  level: number;
+  board: number[];
+  moves: number;
+  seconds: number;
+  playing: boolean;
+  won: boolean;
+  gameOver: boolean;
+  isPaused: boolean;
+  hasGameStarted: boolean;
+  showNumbers: boolean;
+  hintsRemaining: number;
+  coins: number;
+  lives: number;
+  soundEnabled: boolean;
+}
+
+function isSavedProgress(value: unknown): value is SavedProgress {
+  if (typeof value !== "object" || value === null) return false;
+  const saved = value as Record<string, unknown>;
+  const size = saved.difficulty;
+  const board = saved.board;
+  const boardLength = typeof size === "number" ? size * size : 0;
+  const validBoard =
+    Array.isArray(board) &&
+    board.length === boardLength &&
+    board.every((tile) => Number.isInteger(tile) && tile >= 0 && tile < boardLength) &&
+    new Set(board).size === boardLength;
+
+  return (
+    (saved.screen === "welcome" || saved.screen === "game") &&
+    typeof saved.nickname === "string" &&
+    typeof saved.avatar === "string" &&
+    typeof saved.googleEmail === "string" &&
+    typeof saved.googleDisplayName === "string" &&
+    Number.isInteger(saved.themeIndex) &&
+    (saved.themeIndex as number) >= 0 &&
+    (saved.themeIndex as number) < INITIAL_THEMES.length &&
+    (size === 3 || size === 4 || size === 5) &&
+    Number.isInteger(saved.level) && (saved.level as number) >= 1 &&
+    validBoard &&
+    Number.isInteger(saved.moves) && (saved.moves as number) >= 0 &&
+    Number.isInteger(saved.seconds) && (saved.seconds as number) >= 0 &&
+    typeof saved.playing === "boolean" &&
+    typeof saved.won === "boolean" &&
+    typeof saved.gameOver === "boolean" &&
+    typeof saved.isPaused === "boolean" &&
+    typeof saved.hasGameStarted === "boolean" &&
+    typeof saved.showNumbers === "boolean" &&
+    Number.isInteger(saved.hintsRemaining) &&
+    (saved.hintsRemaining as number) >= 0 &&
+    (saved.hintsRemaining as number) <= 3 &&
+    Number.isInteger(saved.coins) && (saved.coins as number) >= 0 &&
+    Number.isInteger(saved.lives) && (saved.lives as number) >= 0 &&
+    typeof saved.soundEnabled === "boolean"
+  );
+}
+
+function loadSavedProgress(): SavedProgress | null {
+  try {
+    const stored = localStorage.getItem(PROGRESS_STORAGE_KEY);
+    if (!stored) return null;
+    const parsed: unknown = JSON.parse(stored);
+    return isSavedProgress(parsed) ? parsed : null;
+  } catch (error) {
+    console.error("Não foi possível carregar o progresso salvo.", error);
+    return null;
+  }
+}
+
+const savedProgress = loadSavedProgress();
 
 function createSolved(size: Difficulty) {
   return Array.from({ length: size * size }, (_, i) => i);
@@ -45,30 +125,31 @@ function formatTime(total: number) {
 }
 
 export default function App() {
-  const [screen, setScreen] = useState<ScreenState>("welcome");
+  const [screen, setScreen] = useState<ScreenState>(savedProgress?.screen ?? "welcome");
   const [isSplashVisible, setIsSplashVisible] = useState(true);
-  const [nickname, setNickname] = useState("Jogador");
-  const [avatar, setAvatar] = useState("😀");
+  const [nickname, setNickname] = useState(savedProgress?.nickname ?? "Jogador");
+  const [avatar, setAvatar] = useState(savedProgress?.avatar ?? "😀");
   const [isGoogleLoginOpen, setIsGoogleLoginOpen] = useState(false);
-  const [googleEmail, setGoogleEmail] = useState("");
-  const [googleDisplayName, setGoogleDisplayName] = useState("");
-  const [themeIndex, setThemeIndex] = useState(0);
-  const [difficulty, setDifficulty] = useState<Difficulty>(3);
-  const [level, setLevel] = useState(1);
-  const [board, setBoard] = useState<number[]>(() => shufflePuzzle(3));
-  const [moves, setMoves] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [won, setWon] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [showNumbers, setShowNumbers] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState(savedProgress?.googleEmail ?? "");
+  const [googleDisplayName, setGoogleDisplayName] = useState(savedProgress?.googleDisplayName ?? "");
+  const [themeIndex, setThemeIndex] = useState(savedProgress?.themeIndex ?? 0);
+  const [difficulty, setDifficulty] = useState<Difficulty>(savedProgress?.difficulty ?? 3);
+  const [level, setLevel] = useState(savedProgress?.level ?? 1);
+  const [board, setBoard] = useState<number[]>(savedProgress?.board ?? shufflePuzzle(3));
+  const [moves, setMoves] = useState(savedProgress?.moves ?? 0);
+  const [seconds, setSeconds] = useState(savedProgress?.seconds ?? 0);
+  const [playing, setPlaying] = useState(savedProgress?.playing ?? false);
+  const [won, setWon] = useState(savedProgress?.won ?? false);
+  const [gameOver, setGameOver] = useState(savedProgress?.gameOver ?? false);
+  const [isPaused, setIsPaused] = useState(savedProgress?.isPaused ?? false);
+  const [hasGameStarted, setHasGameStarted] = useState(savedProgress?.hasGameStarted ?? false);
+  const [showNumbers, setShowNumbers] = useState(savedProgress?.showNumbers ?? false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [hintsRemaining, setHintsRemaining] = useState(3);
+  const [hintsRemaining, setHintsRemaining] = useState(savedProgress?.hintsRemaining ?? 3);
   const [hintTileIndex, setHintTileIndex] = useState<number | null>(null);
-  const [coins, setCoins] = useState(120);
-  const [lives, setLives] = useState(3);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [coins, setCoins] = useState(savedProgress?.coins ?? 120);
+  const [lives, setLives] = useState(savedProgress?.lives ?? 3);
+  const [soundEnabled, setSoundEnabled] = useState(savedProgress?.soundEnabled ?? true);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsSplashVisible(false), 1400);
@@ -81,6 +162,42 @@ export default function App() {
     (board.filter((value, i) => value === solved[i]).length / board.length) * 100
   );
 
+  useEffect(() => {
+    const saved: SavedProgress = {
+      screen,
+      nickname,
+      avatar,
+      googleEmail,
+      googleDisplayName,
+      themeIndex,
+      difficulty,
+      level,
+      board,
+      moves,
+      seconds,
+      playing,
+      won,
+      gameOver,
+      isPaused,
+      hasGameStarted,
+      showNumbers,
+      hintsRemaining,
+      coins,
+      lives,
+      soundEnabled,
+    };
+
+    try {
+      localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(saved));
+    } catch (error) {
+      console.error("Não foi possível salvar o progresso do jogo.", error);
+    }
+  }, [
+    screen, nickname, avatar, googleEmail, googleDisplayName, themeIndex, difficulty,
+    level, board, moves, seconds, playing, won, gameOver, isPaused, hasGameStarted,
+    showNumbers, hintsRemaining, coins, lives, soundEnabled,
+  ]);
+
   const startRound = (nextDifficulty: Difficulty = difficulty, nextLevel = level) => {
     setDifficulty(nextDifficulty);
     setLevel(nextLevel);
@@ -92,6 +209,7 @@ export default function App() {
     setIsPaused(false);
     setHintsRemaining(3);
     setHintTileIndex(null);
+    setHasGameStarted(true);
     setPlaying(true);
   };
 
@@ -101,18 +219,25 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [playing, won, gameOver, isPaused]);
 
-  const handleStartGame = () => {
-    const playerName = nickname.trim() || "Jogador";
+  const continueGame = () => {
     setScreen("game");
-    startRound(difficulty, level);
-    setNickname(playerName);
+    if (hasGameStarted) {
+      setIsPaused(false);
+      if (!won && !gameOver) setPlaying(true);
+    } else {
+      startRound(difficulty, level);
+    }
+  };
+
+  const handleStartGame = () => {
+    setNickname(nickname.trim() || "Jogador");
+    continueGame();
   };
 
   const handleGuestStart = () => {
     setNickname("Convidado");
     setAvatar("🙂");
-    setScreen("game");
-    startRound(difficulty, level);
+    continueGame();
   };
 
   const handleGoogleStart = (event: React.FormEvent<HTMLFormElement>) => {
@@ -120,11 +245,13 @@ export default function App() {
     const email = googleEmail.trim();
     if (!email) return;
 
-    setNickname(googleDisplayName.trim() || email.split("@")[0]);
+    const displayName = googleDisplayName.trim() || email.split("@")[0];
+    setNickname(displayName);
     setAvatar("😀");
+    setGoogleEmail(email);
+    setGoogleDisplayName(displayName);
     setIsGoogleLoginOpen(false);
-    setScreen("game");
-    startRound(difficulty, level);
+    continueGame();
   };
 
   const handleNextLevel = () => {
@@ -187,23 +314,10 @@ export default function App() {
     setHintsRemaining((remaining) => remaining - 1);
   };
 
-  const resetGame = () => {
+  const handleLogout = () => {
     setScreen("welcome");
-    setNickname("Jogador");
-    setAvatar("😀");
-    setLives(3);
-    setCoins(120);
-    setLevel(1);
-    setDifficulty(3);
-    setBoard(shufflePuzzle(3));
-    setMoves(0);
-    setSeconds(0);
-    setWon(false);
-    setGameOver(false);
-    setIsPaused(false);
-    setHintsRemaining(3);
-    setHintTileIndex(null);
     setPlaying(false);
+    if (hasGameStarted && !won && !gameOver) setIsPaused(true);
   };
 
   return (
@@ -320,15 +434,15 @@ export default function App() {
           </div>
 
           <button type="button" className="start-button" onClick={handleStartGame}>
-            Jogar com este perfil
+            {hasGameStarted ? `Continuar nível ${level}` : "Jogar com este perfil"}
           </button>
-          <p className="security-note">Jogo seguro. Você também pode jogar sem criar um perfil.</p>
+          <p className="security-note">Seu progresso fica salvo neste dispositivo, mesmo ao sair.</p>
         </section>
       ) : (
         <section className="game-card">
           <header className="game-topbar">
-            <button type="button" className="ghost-button" onClick={resetGame}>
-              ← Menu
+            <button type="button" className="ghost-button" onClick={handleLogout}>
+              ← Sair
             </button>
             <div className="status-row">
               <div className="stat-pill coin">🪙 {coins}</div>
@@ -506,8 +620,8 @@ export default function App() {
                   <button type="button" onClick={() => startRound(difficulty, level)}>
                     Recomeçar
                   </button>
-                  <button type="button" className="secondary" onClick={resetGame}>
-                    Menu
+                  <button type="button" className="secondary" onClick={handleLogout}>
+                    Sair
                   </button>
                 </div>
               </div>
