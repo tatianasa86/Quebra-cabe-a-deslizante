@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd quebra-cabeca-deslizante && pnpm install --frozen-lockfile",
+  "buildCommand": "cd quebra-cabeca-deslizante && pnpm run build",
+  "outputDirectory": "quebra-cabeca-deslizante/dist"
+}
